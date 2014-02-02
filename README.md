@@ -1,4 +1,4 @@
-# DayzWhitey - Whitelist Administration Tool
+# DayzWhitey - Whitelist Administration
 
 ![logo](http://i.imgur.com/zAvBpbN.png)
 
