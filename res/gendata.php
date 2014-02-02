@@ -93,22 +93,22 @@ $namesc = count($names) - 1;
 echo 'go user' . PHP_EOL;
 
 for ($i = 0; $i < $createDataUser; $i++) {
-	$name = $names[rand(0, $namesc)];
-	$app['entryManager']->addEntry($name . '-' . $i, strtolower($name) . '-' . $i . '@provider.com', md5($i));
+    $name = $names[rand(0, $namesc)];
+    $app['entryManager']->addEntry($name . '-' . $i, strtolower($name) . '-' . $i . '@provider.com', md5($i));
 }
 
 echo 'go log' . PHP_EOL;
 
 for ($i = 0; $i < $createDataLog; $i++) {
-	$name = $names[rand(0, $namesc)];
+    $name = $names[rand(0, $namesc)];
 
-	$stmt = $app['db']->prepare('INSERT INTO log (`name`, `GUID`, `timestamp`, `logtype`) VALUES (?, ?, ?, ?)');
-	$stmt->execute(array(
-		$name . '-' . $i,
-		md5('wll' . $i),
-		date('Y-m-d H:i:s'),
-		rand(3, 4)
-	));
+    $stmt = $app['db']->prepare('INSERT INTO log (`name`, `GUID`, `timestamp`, `logtype`) VALUES (?, ?, ?, ?)');
+    $stmt->execute(array(
+        $name . '-' . $i,
+        md5('wll' . $i),
+        date('Y-m-d H:i:s'),
+        rand(3, 4)
+    ));
 }
 
 echo 'done' . PHP_EOL;
