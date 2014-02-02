@@ -1,41 +1,50 @@
 <?php
 
+/*
+ * This file is part of DayZWhitey
+ *
+ * (c) venyii <ven@cersei.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Venyii\DayZWhitey\DataTables\Type;
 
 use Silex\Application;
 
-interface TypeInterface {
+interface TypeInterface
+{
+    /**
+     * @return string
+     */
+    public function getId();
 
-	/**
-	 * @return string
-	 */
-	public function getId();
+    /**
+     * @return string
+     */
+    public function getTable();
 
-	/**
-	 * @return string
-	 */
-	public function getTable();
+    /**
+     * @return string
+     */
+    public function getIndexColumn();
 
-	/**
-	 * @return string
-	 */
-	public function getIndexColumn();
+    /**
+     * Array of database columns which should be read and sent back to DataTables.
+     * Use a space where you want to insert a non-database field (for example a counter or static image)
+     *
+     * @return array
+     */
+    public function getReadableColumns();
 
-	/**
-	 * Array of database columns which should be read and sent back to DataTables.
-	 * Use a space where you want to insert a non-database field (for example a counter or static image)
-	 *
-	 * @return array
-	 */
-	public function getReadableColumns();
+    public function getAllColumns();
 
-	public function getAllColumns();
-
-	/**
-	 * @param Application $app
-	 * @param array $data
-	 * @return array
-	 */
-	public function modifyOutputData(Application $app, array $data);
+    /**
+     * @param  Application $app
+     * @param  array       $data
+     * @return array
+     */
+    public function modifyOutputData(Application $app, array $data);
 
 }
