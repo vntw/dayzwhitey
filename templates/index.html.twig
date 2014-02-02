@@ -1,0 +1,76 @@
+{% extends 'struct.html.twig' %}
+
+{% block content %}
+
+    {% for type,flashAlerts in app.session.getFlashBag.all %}
+        <div id="alert-container">
+            {% for alert in flashAlerts %}
+                <div class="center alert alert-{{ type }}">{{ alert }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <div id="add-entry-box" class="box">
+        <div class="title">Create entry</div>
+
+        <form action="/{{ app.cfg.general.site_subdir }}/create" method="post" class="form-inline" role="form">
+            <div class="form-group">
+                <label for="aeb-name">Name</label>
+                <input type="text" name="name" class="form-control" id="aeb-name" placeholder="JohnDoe" required/>
+            </div>
+            <div class="form-group">
+                <label for="aeb-email">Email</label>
+                <input type="email" name="email" class="form-control" id="aeb-email" placeholder="johndoe@provider.com" required/>
+            </div>
+            <div class="form-group">
+                <label for="aeb-guid">GUID</label>
+                <input type="string" name="identifier" class="form-control" id="aeb-guid" placeholder="c81e728d9d4c2f636f067f89cc14862c" required pattern=".{32}" title="Must be 32 chars long"/>
+            </div>
+            <input type="submit" class="btn btn-standard" name="addEntry" value="Save"/>
+        </form>
+    </div>
+
+    <div class="box">
+        <div class="title">Whitelist</div>
+        <table id="whitelist" class="table table-hover table-striped datagrid vert-mid">
+            <thead>
+            <tr>
+                <th class="center">X</th>
+                <th class="center">Status</th>
+                <th data-tbl="id" class="center">ID</th>
+                <th data-tbl="name">Name</th>
+                <th data-tbl="email">Email</th>
+                <th data-tbl="identifier">GUID</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="5">&nbsp;</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="box">
+        <div class="title">Whitelist Log</div>
+        <table id="whitelistlog" class="table table-hover table-striped datagrid vert-mid">
+            <thead>
+            <tr>
+                <th class="center">ID</th>
+                <th>Name</th>
+                <th>GUID</th>
+                <th>Timestamp</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="5">&nbsp;</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="clearfix"></div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <title>Dayz Whitey - Whitelist Administration Tool</title>
+    <meta charset="utf-8"/>
+
+    {% if app.debug %}
+        <link href="/{{ app.cfg.general.site_subdir }}/static/css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="/{{ app.cfg.general.site_subdir }}/static/css/vendor/jquery.dataTables.css" rel="stylesheet" type="text/css">
+        <link href="/{{ app.cfg.general.site_subdir }}/static/css/vendor/dataTables.bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="/{{ app.cfg.general.site_subdir }}/static/css/style.css" rel="stylesheet" type="text/css">
+    {% else %}
+        <link href="/{{ app.cfg.general.site_subdir }}/static/css/min/dzwl.min.3e273646f65d574a38c32322c25d5171.css" rel="stylesheet" type="text/css">
+    {% endif %}
+
+</head>
+<body>
+    <div id="wrapper" class="container">
+
+        <h1>
+            <a href="/{{ app.cfg.general.site_subdir }}">Dayz Whitey - Whitelist Administration Tool</a>
+        </h1>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        var DW_SUBDIR = '/{{ app.cfg.general.site_subdir }}';
+    </script>
+
+    {% if app.debug %}
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/vendor/jquery-2.1.0.js"></script>
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/vendor/bootstrap.js"></script>
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/vendor/jquery.dataTables.js"></script>
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/vendor/dataTables.bootstrap.js"></script>
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/vendor/jquery.jeditable.js"></script>
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/script.js"></script>
+    {% else %}
+        <script src="/{{ app.cfg.general.site_subdir }}/static/js/min/dzwl.min.80e5e17a0a3dc5daaa7dacfb94cc0664.js"></script>
+    {% endif %}
+</body>
+</html>

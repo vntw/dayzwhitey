@@ -1,0 +1,30 @@
+{
+    "name": "DayZWhitey",
+    "description": "",
+    "inputDir": "/home/user/www/dayzwhitey/web/static",
+    "outputDir": "/home/user/www/dayzwhitey/web/static",
+    "compositions": [
+        {
+            "compressor": "closure",
+            "outputName": "/js/min/dzwl.min.{version|md5}.js",
+            "fileSet": [
+                "/js/vendor/jquery-2.1.0.js",
+                "/js/vendor/bootstrap.js",
+                "/js/vendor/jquery.dataTables.js",
+                "/js/vendor/dataTables.bootstrap.js",
+                "/js/vendor/jquery.jeditable.js",
+                "/js/script.js"
+            ]
+        },
+        {
+            "compressor": "yui",
+            "outputName": "/css/min/dzwl.min.{version|md5}.css",
+            "fileSet": [
+                "/css/vendor/bootstrap.css",
+                "/css/vendor/jquery.dataTables.css",
+                "/css/vendor/dataTables.bootstrap.css",
+                "/css/style.css"
+            ]
+        }
+    ]
+}
