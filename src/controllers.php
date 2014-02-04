@@ -11,9 +11,9 @@ $app->get('/', function () use ($app) {
 });
 
 $app->post('/create', function () use ($app) {
-    $name = $app['request']->get('name');
-    $email = $app['request']->get('email');
-    $identifier = $app['request']->get('identifier');
+    $name = trim($app['request']->get('name'));
+    $email = trim($app['request']->get('email'));
+    $identifier = trim($app['request']->get('identifier'));
 
     $errors = $app['entryManager']->validateEntry($name, $email, $identifier, true);
 

@@ -163,7 +163,7 @@ class Manager
         if (empty($name)) {
             $errors[] = 'Name is empty';
         }
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Invalid email';
         }
         if (empty($identifier) || strlen($identifier) !== 32) {
