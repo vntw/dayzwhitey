@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 $app->get('/', function () use ($app) {
+    $app['pusher']->trigger('dzwl_main', 'add_entry', array('message'=>'Hello World!'));
     $view = $app['twig']->render('index.html.twig', array());
 
     return new Response($view);
@@ -19,6 +20,8 @@ $app->post('/create', function () use ($app) {
 
     if (empty($errors) && $app['entryManager']->addEntry($name, $email, $identifier)) {
         $app['session']->getFlashBag()->add('success', sprintf('Successfully added entry with name \'%s\', email \'%s\' and GUID \'%s\'', $name, $email, $identifier));
+
+        $app['pusher']->trigger('dzwl_main', 'add_entry', array('message'=>'Hello World!'));
     } else {
         $app['session']->getFlashBag()->add('error', 'Error: ' . implode(', ', $errors));
     }

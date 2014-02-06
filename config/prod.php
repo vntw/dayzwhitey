@@ -5,6 +5,7 @@ use Venyii\DayZWhitey\Config;
 use Venyii\DayZWhitey\Entry\Manager;
 use Venyii\DayZWhitey\DataTables\DataSource;
 use Venyii\DayZWhitey\DataTables\Type;
+use Venyii\DayZWhitey\Pusher\PusherServiceProvider;
 
 $app['twig.path'] = __DIR__ . '/../templates';
 $app['twig.options'] = array('cache' => __DIR__ . '/../var/cache/twig');
@@ -40,3 +41,9 @@ $app['dataSource'] = $app->share(function () use ($app) {
 $app['entryManager'] = $app->share(function () use ($app) {
     return new Manager($app);
 });
+
+$app->register(new PusherServiceProvider(), array(
+    'pusher.api_key' => $app['cfg']['pusher']['api_key'],
+    'pusher.api_secret' => $app['cfg']['pusher']['api_secret'],
+    'pusher.api_id' => $app['cfg']['pusher']['api_id']
+));

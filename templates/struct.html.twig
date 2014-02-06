@@ -37,5 +37,22 @@
     {% else %}
         <script src="/{{ app.cfg.general.site_subdir }}/static/js/min/dzwl.min.80e5e17a0a3dc5daaa7dacfb94cc0664.js"></script>
     {% endif %}
+
+    <script src="http://js.pusher.com/2.1/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't include this in production
+        Pusher.log = function (message) {
+            if (window.console && window.console.log) {
+                window.console.log(message);
+            }
+        };
+
+        var pusher = new Pusher('{{ app.cfg.pusher.api_key }}');
+        var channel = pusher.subscribe('dzwl_main');
+        channel.bind('add_entry', function (data) {
+            // redraw and go to page x
+        });
+    </script>
+
 </body>
 </html>
