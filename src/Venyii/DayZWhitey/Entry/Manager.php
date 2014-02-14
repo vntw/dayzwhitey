@@ -82,7 +82,8 @@ class Manager
             throw new \InvalidArgumentException('Invalid column');
         }
 
-        $stmt = $this->app['db']->prepare('UPDATE whitelist SET ' . $field . ' = :value WHERE `id` = :id');
+        $query = 'UPDATE whitelist SET ' . $field . ' = :value WHERE `id` = :id';
+        $stmt = $this->app['db']->prepare($query);
 
         return $stmt->execute(array(
             'id' => $id,
@@ -124,7 +125,8 @@ class Manager
         }
 
         $db = $this->app['db'];
-        $stmt = $db->prepare('SELECT * FROM whitelist WHERE ' . $field . ' = :value');
+        $query = 'SELECT * FROM whitelist WHERE ' . $field . ' = :value';
+        $stmt = $db->prepare($query);
 
         $stmt->execute(array(
             'value' => $value
