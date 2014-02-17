@@ -14,6 +14,7 @@ namespace Venyii\DayZWhitey\DataTables;
 use Silex\Application;
 use Venyii\DayZWhitey\Db;
 use Venyii\DayZWhitey\DataTables\Type\TypeInterface;
+use Venyii\DayZWhitey\Helper\HtmlUtil;
 
 class DataSource
 {
@@ -96,7 +97,7 @@ class DataSource
                 $sortCol = isset($_GET['iSortCol_' . $i]) ? (int) $_GET['iSortCol_' . $i] : null;
 
                 if (null !== $sortCol && $_GET['bSortable_' . $sortCol] == 'true' && isset($tableColumns[$sortCol]) && null !== $tableColumns[$sortCol]) {
-                    $sortOrder .= '`' . $tableColumns[$sortCol] . '` ' . ($_GET['sSortDir_' . $i] === 'asc' ? 'asc' : 'desc') . ', ';
+                    $sortOrder .= '`' . $tableColumns[$sortCol] . '` ' . ($_GET['sSortDir_' . $i] === 'asc' ? 'ASC' : 'DESC') . ', ';
                 }
             }
 
@@ -116,28 +117,27 @@ class DataSource
         if (isset($_GET['sSearch']) && $_GET['sSearch'] != '') {
             $where = 'WHERE (';
             foreach ($type->getReadableColumns() as $column) {
-                $where .= "'`' . $column . '` LIKE '%" . $_GET['sSearch'] . "%' OR ";
+                $where .= sprintf('%s LIKE \'%%%s%%\' OR ', $column, HtmlUtil::escape($_GET['sSearch']));
             }
             $where = substr_replace($where, '', -3);
             $where .= ')';
         }
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($tableColumns); $i++) {
+        $tableColumnCount = count($tableColumns);
+
+        for ($i = 0; $i < $tableColumnCount; $i++) {
             if (isset($_GET['bSearchable_' . $i]) && $_GET['bSearchable_' . $i] == 'true' && $_GET['sSearch_' . $i] != '') {
                 if ($where == '') {
                     $where = 'WHERE ';
                 } else {
                     $where .= ' AND ';
                 }
-                $where .= "`" . $tableColumns[$i] . "` LIKE '%" . $_GET['sSearch_' . $i] . "%' ";
+                $where .= "`" . $tableColumns[$i] . "` LIKE '%" . HtmlUtil::escape($_GET['sSearch_' . $i]) . "%' ";
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
+        // SQL queries - Get data to display
         $query = sprintf(
             'SELECT SQL_CALC_FOUND_ROWS `%s` FROM %s %s %s %s',
             str_replace(' , ', ' ', implode('`, `', $type->getReadableColumns())),
