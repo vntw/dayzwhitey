@@ -14,6 +14,7 @@ namespace Venyii\DayZWhitey\DataTables;
 use Silex\Application;
 use Venyii\DayZWhitey\Db;
 use Venyii\DayZWhitey\DataTables\Type\TypeInterface;
+use Venyii\DayZWhitey\Helper\HtmlUtil;
 
 class DataSource
 {
@@ -74,39 +75,35 @@ class DataSource
             $type = $this->getType($type);
         }
 
-        $aColumns = $type->getAllColumns();
+        $tableName = $type->getTable();
+        $tableColumns = $type->getAllColumns();
+        // Indexed column (used for fast and accurate table cardinality)
+        $indexColumn = $type->getIndexColumn();
 
-        /* Indexed column (used for fast and accurate table cardinality) */
-        $sIndexColumn = $type->getIndexColumn();
+        // Paging
+        $queryLimit = '';
+        $displayStart = isset($_GET['iDisplayStart']) ? (int) $_GET['iDisplayStart'] : null;
+        $displayLength = isset($_GET['iDisplayLength']) ? (int) $_GET['iDisplayLength'] : null;
 
-        $sTable = $type->getTable();
-
-        /*
-         * Paging
-         */
-        $sLimit = "";
-        if (isset($_GET['iDisplayStart']) && $_GET['iDisplayLength'] != '-1') {
-            $sLimit = "LIMIT " . intval($_GET['iDisplayStart']) . ", " .
-                intval($_GET['iDisplayLength']);
+        if (null !== $displayStart && null !== $displayLength && $displayLength !== -1) {
+            $queryLimit = sprintf('LIMIT %d, %d', $displayStart, $displayLength);
         }
 
-        /*
-         * Ordering
-         */
-        $sOrder = "";
+        // Ordering
+        $sortOrder = '';
         if (isset($_GET['iSortCol_0'])) {
-            $sOrder = "ORDER BY  ";
-            for ($i = 0; $i < intval($_GET['iSortingCols']); $i++) {
+            $sortOrder = 'ORDER BY  ';
+            for ($i = 0; $i < (int) $_GET['iSortingCols']; $i++) {
                 $sortCol = isset($_GET['iSortCol_' . $i]) ? (int) $_GET['iSortCol_' . $i] : null;
 
-                if (null !== $sortCol && $_GET['bSortable_' . $sortCol] == "true" && isset($aColumns[$sortCol]) && null !== $aColumns[$sortCol]) {
-                    $sOrder .= "`" . $aColumns[$sortCol] . "` " . ($_GET['sSortDir_' . $i] === 'asc' ? 'asc' : 'desc') . ", ";
+                if (null !== $sortCol && $_GET['bSortable_' . $sortCol] == 'true' && isset($tableColumns[$sortCol]) && null !== $tableColumns[$sortCol]) {
+                    $sortOrder .= '`' . $tableColumns[$sortCol] . '` ' . ($_GET['sSortDir_' . $i] === 'asc' ? 'ASC' : 'DESC') . ', ';
                 }
             }
 
-            $sOrder = substr_replace($sOrder, "", -2);
-            if ($sOrder == "ORDER BY") {
-                $sOrder = "";
+            $sortOrder = substr_replace($sortOrder, '', -2);
+            if ($sortOrder == 'ORDER BY') {
+                $sortOrder = '';
             }
         }
 
@@ -116,58 +113,54 @@ class DataSource
          * word by word on any field. It's possible to do here, but concerned about efficiency
          * on very large tables, and MySQL's regex functionality is very limited
          */
-        $sWhere = "";
-        if (isset($_GET['sSearch']) && $_GET['sSearch'] != "") {
-            $sWhere = "WHERE (";
+        $where = '';
+        if (isset($_GET['sSearch']) && $_GET['sSearch'] != '') {
+            $where = 'WHERE (';
             foreach ($type->getReadableColumns() as $column) {
-                $sWhere .= "`" . $column . "` LIKE '%" . $_GET['sSearch'] . "%' OR ";
+                $where .= sprintf('%s LIKE \'%%%s%%\' OR ', $column, HtmlUtil::escape($_GET['sSearch']));
             }
-            $sWhere = substr_replace($sWhere, "", -3);
-            $sWhere .= ')';
+            $where = substr_replace($where, '', -3);
+            $where .= ')';
         }
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
-            if (isset($_GET['bSearchable_' . $i]) && $_GET['bSearchable_' . $i] == "true" && $_GET['sSearch_' . $i] != '') {
-                if ($sWhere == "") {
-                    $sWhere = "WHERE ";
+        $tableColumnCount = count($tableColumns);
+
+        for ($i = 0; $i < $tableColumnCount; $i++) {
+            if (isset($_GET['bSearchable_' . $i]) && $_GET['bSearchable_' . $i] == 'true' && $_GET['sSearch_' . $i] != '') {
+                if ($where == '') {
+                    $where = 'WHERE ';
                 } else {
-                    $sWhere .= " AND ";
+                    $where .= ' AND ';
                 }
-                $sWhere .= "`" . $aColumns[$i] . "` LIKE '%" . $_GET['sSearch_' . $i] . "%' ";
+                $where .= "`" . $tableColumns[$i] . "` LIKE '%" . HtmlUtil::escape($_GET['sSearch_' . $i]) . "%' ";
             }
         }
 
-        /*
-         * SQL queries
-         * Get data to display
-         */
-        $sQuery = "
-        SELECT SQL_CALC_FOUND_ROWS `" . str_replace(" , ", " ", implode("`, `", $type->getReadableColumns())) . "`
-        FROM   $sTable
-        $sWhere
-        $sOrder
-        $sLimit
-        ";
+        // SQL queries - Get data to display
+        $query = sprintf(
+            'SELECT SQL_CALC_FOUND_ROWS `%s` FROM %s %s %s %s',
+            str_replace(' , ', ' ', implode('`, `', $type->getReadableColumns())),
+            $tableName,
+            $where,
+            $sortOrder,
+            $queryLimit
+        );
 
-        $rResult = $app['db']->query($sQuery)->fetchAll(Db::FETCH_ASSOC);
+        $rResult = $app['db']->query($query)->fetchAll(Db::FETCH_ASSOC);
 
         /* Data set length after filtering */
-        $sQuery = "SELECT FOUND_ROWS()";
-        $iFilteredTotal = $app['db']->query($sQuery)->fetchColumn();
+        $foundRowCount = $app['db']->query('SELECT FOUND_ROWS()')->fetchColumn();
 
         /* Total data set length */
-        $sQuery = "SELECT COUNT(`" . $sIndexColumn . "`) FROM $sTable";
-        $iTotal = $app['db']->query($sQuery)->fetchColumn();
+        $countQuery = sprintf('SELECT COUNT(%s) FROM `%s`', $indexColumn, $tableName);
+        $totalResultCount = (int) $app['db']->query($countQuery)->fetch(Db::FETCH_COLUMN);
 
-        /*
-         * Output
-         */
         $output = array(
-            "sEcho" => intval($_GET['sEcho']),
-            "iTotalRecords" => $iTotal,
-            "iTotalDisplayRecords" => $iFilteredTotal,
-            "aaData" => $type->modifyOutputData($app, $rResult)
+            'sEcho' => (int) $_GET['sEcho'],
+            'iTotalRecords' => $totalResultCount,
+            'iTotalDisplayRecords' => $foundRowCount,
+            'aaData' => $type->modifyOutputData($app, $rResult)
         );
 
         return $output;

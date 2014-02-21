@@ -61,24 +61,19 @@ class TypeWhitelistLog implements TypeInterface
     public function modifyOutputData(Application $app, array $data)
     {
         $output = array();
-        $aColumns = $this->getReadableColumns();
+        $columns = $this->getReadableColumns();
+        $columnCount = count($columns);
         $logTypes = $app['db']->query('SELECT id, description FROM logtypes ORDER BY id ASC')->fetchAll($app['db']::FETCH_KEY_PAIR);
 
-        foreach ($data as $aRow) {
+        foreach ($data as $dataEntry) {
             $row = array();
-            for ($i = 0; $i < count($aColumns); $i++) {
-                if ($i === 1) {
-                }
-                if ($aColumns[$i] == "version") {
-                    /* Special output formatting for 'version' column */
-                    $row[] = ($aRow[$aColumns[$i]] == "0") ? '-' : $aRow[$aColumns[$i]];
-                } elseif ($aColumns[$i] === 'logtype') {
-                    $row[] = isset($logTypes[$aRow[$aColumns[$i]]]) ? $logTypes[$aRow[$aColumns[$i]]] : 'n/a';
-                } elseif ($aColumns[$i] === 'timestamp') {
-                    $row[] = date('d.m.Y H:i:s', strtotime($aRow[$aColumns[$i]]));
-                } elseif ($aColumns[$i] != ' ') {
-                    /* General output */
-                    $row[] = $aRow[$aColumns[$i]];
+            for ($i = 0; $i < $columnCount; $i++) {
+                if ($columns[$i] === 'logtype') {
+                    $row[] = isset($logTypes[$dataEntry[$columns[$i]]]) ? $logTypes[$dataEntry[$columns[$i]]] : 'n/a';
+                } elseif ($columns[$i] === 'timestamp') {
+                    $row[] = date('d.m.Y H:i:s', strtotime($dataEntry[$columns[$i]]));
+                } elseif ($columns[$i] != ' ') {
+                    $row[] = $dataEntry[$columns[$i]];
                 }
             }
 

@@ -61,22 +61,20 @@ class TypeWhitelist implements TypeInterface
     public function modifyOutputData(Application $app, array $data)
     {
         $output = array();
-        $aColumns = $this->getReadableColumns();
+        $columns = $this->getReadableColumns();
+        $columnCount = count($columns);
 
-        foreach ($data as $aRow) {
+        foreach ($data as $dataEntry) {
             $row = array();
-            for ($i = 0; $i < count($aColumns); $i++) {
+            for ($i = 0; $i < $columnCount; $i++) {
                 if ($i === 0) {
-                    $active = (int) $aRow['whitelisted'] === 1 ? ' on' : null;
+                    $active = (int) $dataEntry['whitelisted'] === 1 ? ' on' : null;
                     $row[] = '<button class="btn btn-standard btn-xs delete-entry"><span class="glyphicon glyphicon-trash"></span></button>';
                     $row[] = '<button class="btn btn-state-toggle toggle-state' . $active . '"></button>';
                 }
-                if ($aColumns[$i] == "version") {
-                    /* Special output formatting for 'version' column */
-                    $row[] = ($aRow[$aColumns[$i]] == "0") ? '-' : $aRow[$aColumns[$i]];
-                } elseif ($aColumns[$i] != ' ') {
-                    /* General output */
-                    $row[] = $aRow[$aColumns[$i]];
+
+                if ($columns[$i] != ' ') {
+                    $row[] = $dataEntry[$columns[$i]];
                 }
             }
 
