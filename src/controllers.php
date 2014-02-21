@@ -20,7 +20,7 @@ $app->post('/create', function () use ($app) {
     if (empty($errors) && $app['entryManager']->addEntry($name, $email, $identifier)) {
         $app['session']->getFlashBag()->add('success', sprintf('Successfully added entry with name \'%s\', email \'%s\' and GUID \'%s\'', $name, $email, $identifier));
     } else {
-        $app['session']->getFlashBag()->add('error', 'Error: ' . implode(', ', $errors));
+        $app['session']->getFlashBag()->add('danger', 'Error: ' . implode(', ', $errors));
     }
 
     return new RedirectResponse('/' . $app['cfg']['general']['site_subdir']);
