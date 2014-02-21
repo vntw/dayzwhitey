@@ -6,8 +6,8 @@
 
 DROP DATABASE IF EXISTS whitelist;
 CREATE DATABASE IF NOT EXISTS whitelist
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
+CHARACTER SET utf8
+COLLATE utf8_unicode_ci;
 
 -- Grant access to Dayz Users
 

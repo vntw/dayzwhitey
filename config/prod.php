@@ -24,8 +24,9 @@ $app['cfg'] = $app->share(function () {
 
 $app['db'] = $app->share(function () use ($app) {
     return new Db(
-        sprintf('mysql:dbname=%s;host=%s', $app['cfg']['db']['dbname'], $app['cfg']['db']['host']), $app['cfg']['db']['user'], $app['cfg']['db']['passwd'], array(
-        Db::ATTR_ERRMODE => Db::ERRMODE_EXCEPTION
+        sprintf('mysql:dbname=%s;host=%s;charset=utf8', $app['cfg']['db']['dbname'], $app['cfg']['db']['host']), $app['cfg']['db']['user'], $app['cfg']['db']['passwd'], array(
+        Db::ATTR_ERRMODE => Db::ERRMODE_EXCEPTION,
+        Db::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
     ));
 });
 
